@@ -1,5 +1,8 @@
 import pandas as pd
+import tensorflow as tf
 from imblearn.over_sampling import SMOTE
+import tensorflow.keras.layers as layers
+
 import math
 
 CATEGORIES_COUNT=5
@@ -32,7 +35,7 @@ def importTrainingSet(shuffle:bool,samples:int=None):
         x=balanced[balanced.columns[:-1]]
     elif shuffle:
         dataframe=pd.concat([x,y],axis=1)
-        dataframe=df.sample(frac=1).reset_index(drop=True)
+        dataframe=dataframe.sample(frac=1).reset_index(drop=True)
         y=dataframe[dataframe.columns[-1:]]
         x=dataframe[dataframe.columns[:-1]]
 
@@ -44,3 +47,30 @@ def importTrainingSet(shuffle:bool,samples:int=None):
     x=x.reshape([x.shape[0],187,1])
 
     return x,y
+
+def evaluete(model:tf.keras.Model,batch_size=500,verbose=True):
+    dataframe_test=pd.read_csv('./mitbih_test.csv', header=None)
+    y_test = dataframe_test[dataframe_test.columns[-1:]]
+    x_test = dataframe_test[dataframe_test.columns[:-1]]
+    y_test = y_test.to_numpy()
+
+    x_test = x_test.to_numpy()
+
+    x_test = x_test.reshape([x_test.shape[0], 187, 1])
+
+    return model.evaluate(x_test,y_test,batch_size,verbose)
+
+def archi1(model):
+    model.add(layers.Conv1D(7, 7, activation='relu', input_shape=(187,1)))
+    model.add(layers.BatchNormalization())
+    model.add(layers.MaxPool1D(2))
+    model.add(layers.Conv1D(5,5,activation='relu'))
+    model.add(layers.BatchNormalization())
+    model.add(layers.MaxPool1D(2))
+    model.add(layers.Conv1D(3,3,activation='relu'))
+    model.add(layers.BatchNormalization())
+    model.add(layers.MaxPool1D(2))
+    model.add(layers.Flatten())
+    model.add(layers.Dense(64,activation='relu'))
+    model.add(layers.Dense(32,activation='relu'))
+    model.add(layers.Dense(5,activation='softmax'))
