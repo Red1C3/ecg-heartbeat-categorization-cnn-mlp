@@ -5,13 +5,9 @@ import math
 CATEGORIES_COUNT=5
 
 #Import the dataset, it can take a subset of it, and shuffle it
-#Still NOT TESTEDTHO
 def importTrainingSet(shuffle:bool,samples:int=None):
     dataframe=pd.read_csv('./mitbih_train.csv',header=None)
 
-    if shuffle:
-        dataframe=dataframe.sample(frac=1).reset_index(drop=True)
-    
     #Last column is the category column, a scaler value from 0 to 4
     y=dataframe[dataframe.columns[-1:]]
     x=dataframe[dataframe.columns[:-1]]
@@ -34,7 +30,11 @@ def importTrainingSet(shuffle:bool,samples:int=None):
             balanced=balanced.sample(frac=1).reset_index(drop=True)
         y=balanced[balanced.columns[-1:]]
         x=balanced[balanced.columns[:-1]]
-
+    elif shuffle:
+        dataframe=pd.concat([x,y],axis=1)
+        dataframe=df.sample(frac=1).reset_index(drop=True)
+        y=dataframe[dataframe.columns[-1:]]
+        x=dataframe[dataframe.columns[:-1]]
 
     y=y.to_numpy()
     x=x.to_numpy()
