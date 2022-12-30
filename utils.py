@@ -217,13 +217,25 @@ def archi4_nn(model):
     model.add(layers.Dense(32,activation='relu'))
     model.add(layers.Dense(16,activation='relu',kernel_regularizer=l2(0.0001)))
     model.add(layers.Dense(5, activation='softmax',kernel_regularizer=l2(0.0001)))
-
+#getting 96/96 
 def archi5_nn(model):
     model.add(layers.Dense(64, activation='relu', input_shape=(187,)))
     model.add(layers.Dropout(0.25))
     model.add(layers.Dense(32,activation='relu'))
-    model.add(layers.Dense(16,activation='relu',kernel_regularizer=l2(0.001)))
-    model.add(layers.Dense(5, activation='softmax',kernel_regularizer=l2(0.001)))
+    model.add(layers.Dense(16,activation='relu',kernel_regularizer=l1_l2(0.0001)))
+    model.add(layers.Dense(5, activation='softmax',kernel_regularizer=l1_l2(0.0001)))
+
+def archi6_nn(model):
+    model.add(layers.Dense(64, activation='relu', input_shape=(187,)))
+    model.add(layers.Dropout(0.25))
+    model.add(layers.Dense(32,activation='relu'))
+    model.add(layers.Dense(20,activation='relu',kernel_regularizer=l1_l2(0.0001)))
+    model.add(layers.Dense(5, activation='softmax',kernel_regularizer=l1_l2(0.0001)))
+
+def archi1_lstm(model):
+    model.add(layers.LSTM(16, input_shape=(187,1)))
+    model.add(layers.Dense(8,activation='relu'))
+    model.add(layers.Dense(5, activation='softmax'))
 
 def predict_nn(model: tf.keras.Model):
     dataframe_test = pd.read_csv('./mitbih_test.csv', header=None)
