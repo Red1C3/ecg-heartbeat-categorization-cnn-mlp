@@ -6,6 +6,7 @@ from imblearn.pipeline import Pipeline
 import tensorflow.keras.layers as layers
 from sklearn.metrics import classification_report
 import numpy as np
+from tensorflow.keras.regularizers import l2,l1,l1_l2
 
 import math
 
@@ -208,6 +209,21 @@ def archi3_nn(model):
     model.add(layers.Dropout(0.3))
     model.add(layers.Dense(32,activation='relu'))
     model.add(layers.Dense(5, activation='softmax'))
+
+# for 10 epochs it did 95 / 95
+def archi4_nn(model):
+    model.add(layers.Dense(64, activation='relu', input_shape=(187,)))
+    model.add(layers.Dropout(0.25))
+    model.add(layers.Dense(32,activation='relu'))
+    model.add(layers.Dense(16,activation='relu',kernel_regularizer=l2(0.0001)))
+    model.add(layers.Dense(5, activation='softmax',kernel_regularizer=l2(0.0001)))
+
+def archi5_nn(model):
+    model.add(layers.Dense(64, activation='relu', input_shape=(187,)))
+    model.add(layers.Dropout(0.25))
+    model.add(layers.Dense(32,activation='relu'))
+    model.add(layers.Dense(16,activation='relu',kernel_regularizer=l2(0.001)))
+    model.add(layers.Dense(5, activation='softmax',kernel_regularizer=l2(0.001)))
 
 def predict_nn(model: tf.keras.Model):
     dataframe_test = pd.read_csv('./mitbih_test.csv', header=None)
