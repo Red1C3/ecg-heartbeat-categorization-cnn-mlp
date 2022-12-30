@@ -196,6 +196,19 @@ def archi1_nn(model):
     model.add(layers.Dense(32,activation='relu'))
     model.add(layers.Dense(5, activation='softmax'))
 
+def archi2_nn(model):
+    model.add(layers.Dense(64, activation='relu', input_shape=(187,)))
+    model.add(layers.Dense(50,activation='relu'))
+    model.add(layers.Dense(42,activation='relu'))
+    model.add(layers.Dense(16,activation='relu'))
+    model.add(layers.Dense(5, activation='softmax'))
+
+def archi3_nn(model):
+    model.add(layers.Dense(64, activation='relu', input_shape=(187,)))
+    model.add(layers.Dropout(0.3))
+    model.add(layers.Dense(32,activation='relu'))
+    model.add(layers.Dense(5, activation='softmax'))
+
 def predict_nn(model: tf.keras.Model):
     dataframe_test = pd.read_csv('./mitbih_test.csv', header=None)
     y_test = dataframe_test[dataframe_test.columns[-1:]]
