@@ -7,6 +7,8 @@ import tensorflow.keras.layers as layers
 from sklearn.metrics import classification_report
 import numpy as np
 from tensorflow.keras.regularizers import l2,l1,l1_l2
+from scipy import signal
+from scipy.interpolate import interp1d
 
 import math
 
@@ -14,11 +16,11 @@ CATEGORIES_COUNT = 5
 
 
 # Import the dataset, it can take a subset of it, and shuffle it
-def importTrainingSet(shuffle: bool, oversampling=False, samples: int = None):
+def importTrainingSet(oversampling=False):
     dataframe = pd.read_csv('./mitbih_train.csv', header=None)
 
-    y = dataframe[dataframe.columns[-1:]]
-    x = dataframe[dataframe.columns[:-1]]
+    #y = dataframe[dataframe.columns[-1:]]
+    #x = dataframe[dataframe.columns[:-1]]
 
     if oversampling:
         #oversampler = SMOTE()
@@ -45,31 +47,13 @@ def importTrainingSet(shuffle: bool, oversampling=False, samples: int = None):
                 newGroup=newGroup.apply(resample_signal,axis=1).reset_index(drop=True)
                 group=pd.concat([group,newGroup],axis=0)
             return group
+        
         dataframe=dataframe.groupby(187).apply(oversample).reset_index(drop=True)
-        y = dataframe[dataframe.columns[-1:]]
-        x = dataframe[dataframe.columns[:-1]]
+       
 
-
-    if samples is not None:
-        category_samples_count = math.ceil(samples / CATEGORIES_COUNT)
-
-        def sampling_k_elements(group):
-            if len(group) < category_samples_count:
-                return group
-            return group.sample(category_samples_count)
-
-        df = pd.concat([x, y], axis=1)
-        balanced = df.groupby(187).apply(sampling_k_elements).reset_index(drop=True)
-        if shuffle:
-            balanced = balanced.sample(frac=1).reset_index(drop=True)
-        y = balanced[balanced.columns[-1:]]
-        x = balanced[balanced.columns[:-1]]
-    elif shuffle:
-        dataframe = pd.concat([x, y], axis=1)
-        dataframe = dataframe.sample(frac=1).reset_index(drop=True)
-        y = dataframe[dataframe.columns[-1:]]
-        x = dataframe[dataframe.columns[:-1]]
-
+    dataframe=dataframe.sample(frac=1)
+    y = dataframe[dataframe.columns[-1:]]
+    x = dataframe[dataframe.columns[:-1]]
     y = y.to_numpy()
     x = x.to_numpy()
 
@@ -281,11 +265,11 @@ def evaluate_nn(model: tf.keras.Model, batch_size=500, verbose=True):
 
 
 # Import the dataset, it can take a subset of it, and shuffle it
-def importTrainingSet_nn(shuffle: bool, oversampling=False, samples: int = None):
+def importTrainingSet_nn(oversampling=False):
     dataframe = pd.read_csv('./mitbih_train.csv', header=None)
 
-    y = dataframe[dataframe.columns[-1:]]
-    x = dataframe[dataframe.columns[:-1]]
+    #y = dataframe[dataframe.columns[-1:]]
+    #x = dataframe[dataframe.columns[:-1]]
 
     if oversampling:
         #oversampler = SMOTE()
@@ -313,30 +297,10 @@ def importTrainingSet_nn(shuffle: bool, oversampling=False, samples: int = None)
                 group=pd.concat([group,newGroup],axis=0)
             return group
         dataframe=dataframe.groupby(187).apply(oversample).reset_index(drop=True)
-        y = dataframe[dataframe.columns[-1:]]
-        x = dataframe[dataframe.columns[:-1]]
 
-
-    if samples is not None:
-        category_samples_count = math.ceil(samples / CATEGORIES_COUNT)
-
-        def sampling_k_elements(group):
-            if len(group) < category_samples_count:
-                return group
-            return group.sample(category_samples_count)
-
-        df = pd.concat([x, y], axis=1)
-        balanced = df.groupby(187).apply(sampling_k_elements).reset_index(drop=True)
-        if shuffle:
-            balanced = balanced.sample(frac=1).reset_index(drop=True)
-        y = balanced[balanced.columns[-1:]]
-        x = balanced[balanced.columns[:-1]]
-    elif shuffle:
-        dataframe = pd.concat([x, y], axis=1)
-        dataframe = dataframe.sample(frac=1).reset_index(drop=True)
-        y = dataframe[dataframe.columns[-1:]]
-        x = dataframe[dataframe.columns[:-1]]
-
+    dataframe=dataframe.sample(frac=1)
+    y = dataframe[dataframe.columns[-1:]]
+    x = dataframe[dataframe.columns[:-1]]
     y = y.to_numpy()
     x = x.to_numpy()
 
