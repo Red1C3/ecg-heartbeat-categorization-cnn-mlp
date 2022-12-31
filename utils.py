@@ -16,11 +16,13 @@ CATEGORIES_COUNT = 5
 
 
 # Import the dataset, it can take a subset of it, and shuffle it
-def importTrainingSet(oversampling=False):
-    dataframe = pd.read_csv('./mitbih_train.csv', header=None)
-
-    #y = dataframe[dataframe.columns[-1:]]
-    #x = dataframe[dataframe.columns[:-1]]
+def importTrainingSet(oversampling=False,binary_set=False):
+    if binary_set==False :
+      dataframe = pd.read_csv('./mitbih_train.csv', header=None)
+    else:
+      normal=pd.read_csv('./ptbdb_normal.csv',header=None)
+      abnormal=pd.read_csv('./ptbdb_abnormal.csv',header=None)
+      dataframe=pd.concat([normal,abnormal],axis=0)
 
     if oversampling:
         #oversampler = SMOTE()
@@ -190,6 +192,16 @@ def archi4(model):
     model.add(layers.GlobalMaxPool1D())
     model.add(layers.Dense(5,activation='softmax',kernel_regularizer=l1_l2(0.0001)))
 
+def archi4_bin(model):
+    model.add(layers.Conv1D(64,7,activation='relu',input_shape=(187,1)))
+    model.add(layers.SpatialDropout1D(0.4))
+    model.add(layers.BatchNormalization())
+    model.add(layers.MaxPool1D(7))
+    model.add(layers.Conv1D(32,5,activation='relu'))
+    model.add(layers.BatchNormalization())
+    model.add(layers.MaxPool1D(5))
+    model.add(layers.GlobalMaxPool1D())
+    model.add(layers.Dense(1,activation='sigmoid',kernel_regularizer=l1_l2(0.0001)))
 
 #93 on training / 92 on testing
 def archi1_nn(model):
@@ -226,6 +238,13 @@ def archi5_nn(model):
     model.add(layers.Dense(32,activation='relu'))
     model.add(layers.Dense(16,activation='relu',kernel_regularizer=l1_l2(0.0001)))
     model.add(layers.Dense(5, activation='softmax',kernel_regularizer=l1_l2(0.0001)))
+
+def archi5_nn_bin(model):
+    model.add(layers.Dense(64, activation='relu', input_shape=(187,)))
+    model.add(layers.Dropout(0.25))
+    model.add(layers.Dense(32,activation='relu'))
+    model.add(layers.Dense(16,activation='relu',kernel_regularizer=l1_l2(0.0001)))
+    model.add(layers.Dense(1, activation='sigmoid',kernel_regularizer=l1_l2(0.0001)))
 
 def archi6_nn(model):
     model.add(layers.Dense(64, activation='relu', input_shape=(187,)))
@@ -265,11 +284,13 @@ def evaluate_nn(model: tf.keras.Model, batch_size=500, verbose=True):
 
 
 # Import the dataset, it can take a subset of it, and shuffle it
-def importTrainingSet_nn(oversampling=False):
-    dataframe = pd.read_csv('./mitbih_train.csv', header=None)
-
-    #y = dataframe[dataframe.columns[-1:]]
-    #x = dataframe[dataframe.columns[:-1]]
+def importTrainingSet_nn(oversampling=False,binary_set=False):
+    if binary_set==False :
+      dataframe = pd.read_csv('./mitbih_train.csv', header=None)
+    else:
+      normal=pd.read_csv('./ptbdb_normal.csv',header=None)
+      abnormal=pd.read_csv('./ptbdb_abnormal.csv',header=None)
+      dataframe=pd.concat([normal,abnormal],axis=0)
 
     if oversampling:
         #oversampler = SMOTE()
