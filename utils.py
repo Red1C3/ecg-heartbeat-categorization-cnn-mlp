@@ -188,6 +188,17 @@ def archi3(model):
     model.add(layers.GlobalMaxPool1D())
     model.add(layers.Dense(5, activation='softmax'))
 
+def archi4(model):
+    model.add(layers.Conv1D(64,7,activation='relu',input_shape=(187,1)))
+    model.add(layers.SpatialDropout1D(0.4))
+    model.add(layers.BatchNormalization())
+    model.add(layers.MaxPool1D(7))
+    model.add(layers.Conv1D(32,5,activation='relu'))
+    model.add(layers.BatchNormalization())
+    model.add(layers.MaxPool1D(5))
+    model.add(layers.GlobalMaxPool1D())
+    model.add(layers.Dense(5,activation='softmax',kernel_regularizer=l1_l2(0.0001)))
+
 
 #93 on training / 92 on testing
 def archi1_nn(model):
