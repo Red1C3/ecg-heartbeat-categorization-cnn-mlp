@@ -21,27 +21,34 @@ def importTrainingSet(shuffle: bool, oversampling=False, samples: int = None):
     x = dataframe[dataframe.columns[:-1]]
 
     if oversampling:
-        oversampler = SMOTE()
-        x, y = oversampler.fit_resample(x, y)
+        #oversampler = SMOTE()
+        #x, y = oversampler.fit_resample(x, y)
 
-        # amplitude oversampling
-        # max_cat_size=max(len(dataframe[dataframe[187]==0]),
-        #                  len(dataframe[dataframe[187]==1]),
-        #                  len(dataframe[dataframe[187]==2]),
-        #                  len(dataframe[dataframe[187]==3]),
-        #                  len(dataframe[dataframe[187]==4]))
-        #
-        # def oversample(group):
-        #     samples_ratio=(max_cat_size//len(group))-1
-        #     group_copy=group.copy()
-        #     for i in range(samples_ratio):
-        #         newGroup=group_copy.copy()
-        #         newGroup[newGroup.columns[:-1]]+=i*0.00001
-        #         group=pd.concat([group,newGroup],axis=0)
-        #     return group
-        # dataframe=dataframe.groupby(187).apply(oversample).reset_index(drop=True)
-        # y = dataframe[dataframe.columns[-1:]]
-        # x = dataframe[dataframe.columns[:-1]]
+        max_cat_size=max(len(dataframe[dataframe[187]==0]),
+                         len(dataframe[dataframe[187]==1]),
+                         len(dataframe[dataframe[187]==2]),
+                         len(dataframe[dataframe[187]==3]),
+                         len(dataframe[dataframe[187]==4]))
+        j=2
+        def resample_signal(row):
+          resampledRow=signal.resample(row[:-1],187*j)
+          f=interp1d(np.linspace(0,187,num=187*j,endpoint=False),resampledRow)
+          row[:-1]=f(np.linspace(0.5,187,num=187,endpoint=False))
+          return row
+        
+        def oversample(group):
+            samples_ratio=(max_cat_size//len(group))-1
+            group_copy=group.copy()
+            for i in range(samples_ratio):
+                global j;j=(i+2)
+                newGroup=group_copy.copy()
+                newGroup=newGroup.apply(resample_signal,axis=1).reset_index(drop=True)
+                group=pd.concat([group,newGroup],axis=0)
+            return group
+        dataframe=dataframe.groupby(187).apply(oversample).reset_index(drop=True)
+        y = dataframe[dataframe.columns[-1:]]
+        x = dataframe[dataframe.columns[:-1]]
+
 
     if samples is not None:
         category_samples_count = math.ceil(samples / CATEGORIES_COUNT)
@@ -281,27 +288,34 @@ def importTrainingSet_nn(shuffle: bool, oversampling=False, samples: int = None)
     x = dataframe[dataframe.columns[:-1]]
 
     if oversampling:
-        oversampler = SMOTE()
-        x, y = oversampler.fit_resample(x, y)
+        #oversampler = SMOTE()
+        #x, y = oversampler.fit_resample(x, y)
+        
+        max_cat_size=max(len(dataframe[dataframe[187]==0]),
+                         len(dataframe[dataframe[187]==1]),
+                         len(dataframe[dataframe[187]==2]),
+                         len(dataframe[dataframe[187]==3]),
+                         len(dataframe[dataframe[187]==4]))
+        j=2
+        def resample_signal(row):
+          resampledRow=signal.resample(row[:-1],187*j)
+          f=interp1d(np.linspace(0,187,num=187*j,endpoint=False),resampledRow)
+          row[:-1]=f(np.linspace(0.5,187,num=187,endpoint=False))
+          return row
+        
+        def oversample(group):
+            samples_ratio=(max_cat_size//len(group))-1
+            group_copy=group.copy()
+            for i in range(samples_ratio):
+                global j;j=(i+2)
+                newGroup=group_copy.copy()
+                newGroup=newGroup.apply(resample_signal,axis=1).reset_index(drop=True)
+                group=pd.concat([group,newGroup],axis=0)
+            return group
+        dataframe=dataframe.groupby(187).apply(oversample).reset_index(drop=True)
+        y = dataframe[dataframe.columns[-1:]]
+        x = dataframe[dataframe.columns[:-1]]
 
-        # amplitude oversampling
-        # max_cat_size=max(len(dataframe[dataframe[187]==0]),
-        #                  len(dataframe[dataframe[187]==1]),
-        #                  len(dataframe[dataframe[187]==2]),
-        #                  len(dataframe[dataframe[187]==3]),
-        #                  len(dataframe[dataframe[187]==4]))
-        #
-        # def oversample(group):
-        #     samples_ratio=(max_cat_size//len(group))-1
-        #     group_copy=group.copy()
-        #     for i in range(samples_ratio):
-        #         newGroup=group_copy.copy()
-        #         newGroup[newGroup.columns[:-1]]+=i*0.00001
-        #         group=pd.concat([group,newGroup],axis=0)
-        #     return group
-        # dataframe=dataframe.groupby(187).apply(oversample).reset_index(drop=True)
-        # y = dataframe[dataframe.columns[-1:]]
-        # x = dataframe[dataframe.columns[:-1]]
 
     if samples is not None:
         category_samples_count = math.ceil(samples / CATEGORIES_COUNT)
