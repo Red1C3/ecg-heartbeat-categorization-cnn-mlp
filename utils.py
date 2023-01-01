@@ -182,26 +182,27 @@ def archi3(model):
     model.add(layers.Dense(5, activation='softmax'))
 
 def archi4(model):
-    model.add(layers.Conv1D(64,7,activation='relu',input_shape=(187,1)))
-    model.add(layers.SpatialDropout1D(0.4))
-    model.add(layers.BatchNormalization())
-    model.add(layers.MaxPool1D(7))
-    model.add(layers.Conv1D(32,5,activation='relu'))
-    model.add(layers.BatchNormalization())
-    model.add(layers.MaxPool1D(5))
-    model.add(layers.GlobalMaxPool1D())
-    model.add(layers.Dense(5,activation='softmax',kernel_regularizer=l1_l2(0.0001)))
+    model.add(layers.Conv1D(64,7,activation='relu',input_shape=(187,1),name="Conv1D-64/7"))
+    model.add(layers.SpatialDropout1D(0.4,name="SD1D-0.4"))
+    model.add(layers.BatchNormalization(name="BN-1"))
+    model.add(layers.MaxPool1D(7,name="MP1D-7"))
+    model.add(layers.Conv1D(32,5,activation='relu',name="Conv1D-32/5"))
+    model.add(layers.BatchNormalization(name="BN-2"))
+    model.add(layers.MaxPool1D(5,name="MP1D-5"))
+    model.add(layers.GlobalMaxPool1D(name="GMP1D"))
+    model.add(layers.Dense(5,activation='softmax',kernel_regularizer=l1_l2(0.0001),name="Output"))
 
 def archi4_bin(model):
-    model.add(layers.Conv1D(64,7,activation='relu',input_shape=(187,1)))
-    model.add(layers.SpatialDropout1D(0.4))
-    model.add(layers.BatchNormalization())
-    model.add(layers.MaxPool1D(7))
-    model.add(layers.Conv1D(32,5,activation='relu'))
-    model.add(layers.BatchNormalization())
-    model.add(layers.MaxPool1D(5))
-    model.add(layers.GlobalMaxPool1D())
-    model.add(layers.Dense(1,activation='sigmoid',kernel_regularizer=l1_l2(0.0001)))
+    model = tf.keras.models.Sequential(name="CNN Binary")
+    model.add(layers.Conv1D(64,7,activation='relu',input_shape=(187,1),name="Conv1D-64/7"))
+    model.add(layers.SpatialDropout1D(0.4,name="SD1D-0.4"))
+    model.add(layers.BatchNormalization(name="BN-1"))
+    model.add(layers.MaxPool1D(7,name="MP1D-7"))
+    model.add(layers.Conv1D(32,5,activation='relu',name="Conv1D-32/5"))
+    model.add(layers.BatchNormalization(name="BN-2"))
+    model.add(layers.MaxPool1D(5,name="MP1D-5"))
+    model.add(layers.GlobalMaxPool1D(name="GMP1D"))
+    model.add(layers.Dense(1,activation='sigmoid',kernel_regularizer=l1_l2(0.0001),name="Output"))
 
 #93 on training / 92 on testing
 def archi1_nn(model):
@@ -233,18 +234,18 @@ def archi4_nn(model):
     model.add(layers.Dense(5, activation='softmax',kernel_regularizer=l2(0.0001)))
 #getting 96/96 
 def archi5_nn(model):
-    model.add(layers.Dense(64, activation='relu', input_shape=(187,)))
-    model.add(layers.Dropout(0.25))
-    model.add(layers.Dense(32,activation='relu'))
-    model.add(layers.Dense(16,activation='relu',kernel_regularizer=l1_l2(0.0001)))
-    model.add(layers.Dense(5, activation='softmax',kernel_regularizer=l1_l2(0.0001)))
+    model.add(layers.Dense(64, activation='relu', input_shape=(187,),name="Dense-64"))
+    model.add(layers.Dropout(0.25,name="Dropout-0.25"))
+    model.add(layers.Dense(32,activation='relu',name="Dense-32"))
+    model.add(layers.Dense(16,activation='relu',kernel_regularizer=l1_l2(0.0001),name="Dense-16"))
+    model.add(layers.Dense(5, activation='softmax',kernel_regularizer=l1_l2(0.0001),name="Output"))
 
 def archi5_nn_bin(model):
-    model.add(layers.Dense(64, activation='relu', input_shape=(187,)))
-    model.add(layers.Dropout(0.25))
-    model.add(layers.Dense(32,activation='relu'))
-    model.add(layers.Dense(16,activation='relu',kernel_regularizer=l1_l2(0.0001)))
-    model.add(layers.Dense(1, activation='sigmoid',kernel_regularizer=l1_l2(0.0001)))
+    model.add(layers.Dense(64, activation='relu', input_shape=(187,),name="Dense-64"))
+    model.add(layers.Dropout(0.25,name="Dropout-0.25"))
+    model.add(layers.Dense(32,activation='relu',name="Dense-32"))
+    model.add(layers.Dense(16,activation='relu',kernel_regularizer=l1_l2(0.0001),name="Dense-16"))
+    model.add(layers.Dense(1, activation='sigmoid',kernel_regularizer=l1_l2(0.0001),name="Output"))
 
 def archi6_nn(model):
     model.add(layers.Dense(64, activation='relu', input_shape=(187,)))
