@@ -41,6 +41,7 @@ def import_set(oversampling,binary_set):
       dataframe = pd.read_csv('./mitbih_train.csv', header=None)
       dataframe_test = pd.read_csv('./mitbih_test.csv', header=None)
 
+	  # Plot the training and testing sets histograms
       fig, ax = plt.subplots(2,sharex=False)
       sns.countplot(x=187,data=dataframe,ax=ax[0])
       sns.countplot(x=187,data=dataframe_test,ax=ax[1])
@@ -50,6 +51,7 @@ def import_set(oversampling,binary_set):
       ax[1].set_xlabel('categories')
       fig.tight_layout()
       
+      # Split and transform the testing set to numpy array
       y_test = dataframe_test[dataframe_test.columns[-1:]]
       x_test = dataframe_test[dataframe_test.columns[:-1]]
       y_test = y_test.to_numpy()
@@ -57,13 +59,21 @@ def import_set(oversampling,binary_set):
     else:
       normal=pd.read_csv('./ptbdb_normal.csv',header=None)
       abnormal=pd.read_csv('./ptbdb_abnormal.csv',header=None)
+      
+      #Stack normal and abnormal sets and shuffle them
       dataframe=pd.concat([normal,abnormal],axis=0)
       dataframe=dataframe.sample(frac=1)
+      
       y = dataframe[dataframe.columns[-1:]]
       x = dataframe[dataframe.columns[:-1]]
+      
+      #Split the stacked set into training and testing
       x,x_test,y,y_test=train_test_split(x,y,test_size=0.2)
+      
+      #Merge the data with labels to apply oversampling if on
       dataframe=pd.concat([x,y],axis=1)
 
+	  # Plot the training and testing sets histograms
       fig, ax = plt.subplots(2,sharex=False)
       sns.countplot(x=187,data=dataframe,ax=ax[0])
       sns.countplot(x=187,data=pd.concat([x_test,y_test],axis=1),ax=ax[1])
@@ -72,7 +82,8 @@ def import_set(oversampling,binary_set):
       ax[1].set_title('Binary-Classification Testing Set')
       ax[1].set_xlabel('normal/abnormal')
       fig.tight_layout()
-
+      
+      # Split and transform the testing set to numpy array
       x_test=x_test.to_numpy()
       y_test=y_test.to_numpy()
 
@@ -85,23 +96,39 @@ def import_set(oversampling,binary_set):
                          len(dataframe[dataframe[187]==4]))
         j=2
         def resample_signal(row):
+                    
+          # Generate a new signal with more samples
           resampledRow=signal.resample(row[:-1],187*j)
+          
+          # Connect the newly generated signal linearly
           f=interp1d(np.linspace(0,187,num=187*j,endpoint=False),resampledRow)
+          
+          # Sample 187 samples out the generated signal after shifting it by 0.5
           row[:-1]=f(np.linspace(0.5,187,num=187,endpoint=False))
           return row
         
         def oversample(group):
+        
+        	# Calculate how many copies of this category you need to generate
             samples_ratio=(max_cat_size//len(group))-1
+            
             group_copy=group.copy()
             for i in range(samples_ratio):
+            	
+            	# Increase the sampling samples so it generates different signals with each newly generated group
                 global j;j=(i+2)
+                
                 newGroup=group_copy.copy()
                 newGroup=newGroup.apply(resample_signal,axis=1).reset_index(drop=True)
+                
+                # Add the newly generated group
                 group=pd.concat([group,newGroup],axis=0)
             return group
         dataframe=dataframe.groupby(187).apply(oversample).reset_index(drop=True)
 
+	# Shuffle the data
     dataframe=dataframe.sample(frac=1)
+    
     y = dataframe[dataframe.columns[-1:]]
     x = dataframe[dataframe.columns[:-1]]
     y = y.to_numpy()
@@ -111,6 +138,8 @@ def import_set(oversampling,binary_set):
 
 
 def evaluate(name,results,x_test,y_test,is_multi,verbose):
+
+  # Plots definations
   fig, ax = plt.subplots(2,sharex=True)
   fig.suptitle(name)
   ax[0].set_title("Accuracy")
@@ -121,11 +150,17 @@ def evaluate(name,results,x_test,y_test,is_multi,verbose):
   ax[1].plot(results.epoch, results.history['loss'],label='Train');
   ax[1].plot(results.epoch, results.history['val_loss'],label='Validation');
   ax[1].legend()
+  
+  # Predict test set results using the model
   y_pred=results.model.predict(x_test,verbose=verbose)
+  
   if is_multi:
+  	# Change data format from hot-shot encoding to the resultant category index (cuz softmax)
     y_pred=np.argmax(y_pred,axis=1)
   else:
+  	# Round the results (cuz sigmoid)
     y_pred=np.round(y_pred)
+
   print(classification_report(y_test,y_pred))
   print(name+' evaluation:')
   evaluation=results.model.evaluate(x_test,y_test,verbose=verbose)
