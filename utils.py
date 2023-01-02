@@ -8,6 +8,7 @@ from tensorflow.keras.regularizers import l2,l1,l1_l2
 from sklearn.model_selection import train_test_split
 from scipy import signal
 from scipy.interpolate import interp1d
+import seaborn as sns
 
 import math
 
@@ -39,6 +40,16 @@ def import_set(oversampling,binary_set):
     if binary_set==False :
       dataframe = pd.read_csv('./mitbih_train.csv', header=None)
       dataframe_test = pd.read_csv('./mitbih_test.csv', header=None)
+
+      fig, ax = plt.subplots(2,sharex=False)
+      sns.countplot(x=187,data=dataframe,ax=ax[0])
+      sns.countplot(x=187,data=dataframe_test,ax=ax[1])
+      ax[0].set_title('Multi-Classification Training Set')
+      ax[0].set_xlabel('categories')
+      ax[1].set_title('Multi-Classification Testing Set')
+      ax[1].set_xlabel('categories')
+      fig.tight_layout()
+      
       y_test = dataframe_test[dataframe_test.columns[-1:]]
       x_test = dataframe_test[dataframe_test.columns[:-1]]
       y_test = y_test.to_numpy()
@@ -52,6 +63,16 @@ def import_set(oversampling,binary_set):
       x = dataframe[dataframe.columns[:-1]]
       x,x_test,y,y_test=train_test_split(x,y,test_size=0.2)
       dataframe=pd.concat([x,y],axis=1)
+
+      fig, ax = plt.subplots(2,sharex=False)
+      sns.countplot(x=187,data=dataframe,ax=ax[0])
+      sns.countplot(x=187,data=pd.concat([x_test,y_test],axis=1),ax=ax[1])
+      ax[0].set_title('Binary-Classification Training Set')
+      ax[0].set_xlabel('normal/abnormal')
+      ax[1].set_title('Binary-Classification Testing Set')
+      ax[1].set_xlabel('normal/abnormal')
+      fig.tight_layout()
+
       x_test=x_test.to_numpy()
       y_test=y_test.to_numpy()
 
