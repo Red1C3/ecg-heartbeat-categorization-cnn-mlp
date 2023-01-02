@@ -41,13 +41,13 @@ def import_set(oversampling,binary_set):
       dataframe = pd.read_csv('./mitbih_train.csv', header=None)
       dataframe_test = pd.read_csv('./mitbih_test.csv', header=None)
 
-	  # Plot the training and testing sets histograms
+	  # Plot the original training and testing sets histograms
       fig, ax = plt.subplots(2,sharex=False)
       sns.countplot(x=187,data=dataframe,ax=ax[0])
       sns.countplot(x=187,data=dataframe_test,ax=ax[1])
-      ax[0].set_title('Multi-Classification Training Set')
+      ax[0].set_title('Original Multi-Classification Training Set')
       ax[0].set_xlabel('categories')
-      ax[1].set_title('Multi-Classification Testing Set')
+      ax[1].set_title('Original Multi-Classification Testing Set')
       ax[1].set_xlabel('categories')
       fig.tight_layout()
       
@@ -73,13 +73,13 @@ def import_set(oversampling,binary_set):
       #Merge the data with labels to apply oversampling if on
       dataframe=pd.concat([x,y],axis=1)
 
-	  # Plot the training and testing sets histograms
+	  # Plot the original training and testing sets histograms
       fig, ax = plt.subplots(2,sharex=False)
       sns.countplot(x=187,data=dataframe,ax=ax[0])
       sns.countplot(x=187,data=pd.concat([x_test,y_test],axis=1),ax=ax[1])
-      ax[0].set_title('Binary-Classification Training Set')
+      ax[0].set_title('Original Binary-Classification Training Set')
       ax[0].set_xlabel('normal/abnormal')
-      ax[1].set_title('Binary-Classification Testing Set')
+      ax[1].set_title('Original Binary-Classification Testing Set')
       ax[1].set_xlabel('normal/abnormal')
       fig.tight_layout()
       
